@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VocaVoid1 launcher — runs VV (console) + VF (VocaForge gateway) together.
+"""VocaVoid launcher — runs VV (console) + VF (VocaForge gateway) together.
 
 Usage:
     python run.py                # starts VF on :8080, VV on :8000
@@ -24,7 +24,7 @@ PROCS = []
 
 def banner():
     print("=" * 56)
-    print("  VocaVoid1  —  VF Music Editor  (VV + VF bundle)")
+    print("  VocaVoid  —  VF Music Editor  (VV + VF bundle)")
     print("=" * 56)
 
 
@@ -80,7 +80,7 @@ def shutdown():
 
 def main():
     import argparse
-    ap = argparse.ArgumentParser(description="VocaVoid1 bundle launcher")
+    ap = argparse.ArgumentParser(description="VocaVoid bundle launcher")
     ap.add_argument("--vv-host", default="127.0.0.1")
     ap.add_argument("--vv-port", type=int, default=8000)
     ap.add_argument("--vf-host", default="127.0.0.1")

@@ -1,5 +1,5 @@
 /* =========================================================================
-   VocaVoid1 — Dark Synth Studio design system
+   VocaVoid — Dark Synth Studio design system
    Single source of truth for the console. Harvey UI component <style> blocks
    reference these CSS variables, so both the HUI chrome and the canvas UI
    share one coherent theme (dark + light).

@@ -1,10 +1,10 @@
-# VocaVoid1（中文文档）
+# VocaVoid（中文文档）
 
 > 一个**带 Web 控制台的 VF 音乐编辑器**，基于 **VocaForge 0.4.2**（后端合成引擎）与 **Harvey UI**（前端框架）构建。
 > [English](./README.md)
 
 在钢琴卷帘上作曲、为每个音符填词、选择声库（`.vfvp`），即可在浏览器里一键合成歌唱音频。
-VocaVoid1 以**VV + VF 同时运行**的方式作为一个整体启动。
+VocaVoid 以**VV + VF 同时运行**的方式作为一个整体启动。
 
 ---
 
@@ -31,7 +31,7 @@ VocaVoid1 以**VV + VF 同时运行**的方式作为一个整体启动。
 ## 快速开始
 
 ```bash
-# 在 VocaVoid1 目录下
+# 在 VocaVoid 目录下
 python run.py
 # 控制台 -> http://127.0.0.1:8000
 # VocaForge -> http://127.0.0.1:8080/api/v1
@@ -80,7 +80,7 @@ VocaVoid 后端 :8000  ── 合成代理 ──▶  VocaForge 网关 :8080  (/
 ## 目录结构
 
 ```
-VocaVoid1/
+VocaVoid/
 ├── run.py              # 启动器（VV + VF）
 ├── vv_server.py        # VocaVoid 后端
 ├── frontend/

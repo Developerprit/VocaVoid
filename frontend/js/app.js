@@ -1,5 +1,5 @@
 /* =========================================================================
-   VocaVoid1 — console controller. Wires Harvey UI chrome + PianoRoll + VV API.
+   VocaVoid — console controller. Wires Harvey UI chrome + PianoRoll + VV API.
    ========================================================================= */
 (function () {
   "use strict";

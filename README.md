@@ -1,10 +1,10 @@
-# VocaVoid1
+# VocaVoid
 
 > A **VF music editor** with a web console, built on **VocaForge 0.4.2** (backend synthesis) and **Harvey UI** (frontend).
 > [中文文档 / Chinese](./README-zh.md)
 
 Compose melodies on a piano-roll, attach lyrics to each note, pick a voicebank
-(`.vfvp`), and synthesize singing voice straight from the browser. VocaVoid1 runs
+(`.vfvp`), and synthesize singing voice straight from the browser. VocaVoid runs
 **VocaVoid (VV) + VocaForge (VF)** together as one bundle.
 
 ---
@@ -32,7 +32,7 @@ Compose melodies on a piano-roll, attach lyrics to each note, pick a voicebank
 ## Quick start
 
 ```bash
-# from the VocaVoid1 folder
+# from the VocaVoid folder
 python run.py
 # console  -> http://127.0.0.1:8000
 # VocaForge -> http://127.0.0.1:8080/api/v1
@@ -82,7 +82,7 @@ VocaVoid backend :8000  ── synth proxy ──▶  VocaForge gateway :8080  (
 ## Project layout
 
 ```
-VocaVoid1/
+VocaVoid/
 ├── run.py              # launcher (VV + VF)
 ├── vv_server.py        # VocaVoid backend
 ├── frontend/

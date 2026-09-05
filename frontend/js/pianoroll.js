@@ -1,5 +1,5 @@
 /* =========================================================================
-   PianoRoll — canvas piano-roll editor for VocaVoid1.
+   PianoRoll — canvas piano-roll editor for VocaVoid.
    Notes: { id, midi, start, duration, lyric }. Time unit = beats (1 beat = 1/4 note).
    Emits onChange() after any edit; onSelect(note|null); onNoteDblClick(note).
    ========================================================================= */

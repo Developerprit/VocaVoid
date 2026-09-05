@@ -4,3 +4,8 @@ __pycache__/
 *.vvbak
 .vscode/
 .DS_Store
+.workbuddy/
+projects/
+wav/
+vfvp/
+_*.*

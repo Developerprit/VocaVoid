@@ -1,4 +1,4 @@
-/* VocaVoid1 — API client for the VV backend (same-origin). English errors. */
+/* VocaVoid — API client for the VV backend (same-origin). English errors. */
 const VV = (function () {
   async function req(method, path, body) {
     const opt = { method, headers: {} };

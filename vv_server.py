@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""VocaVoid1 backend — pure stdlib HTTP server.
+"""VocaVoid backend — pure stdlib HTTP server.
 
 Serves the Harvey UI console (frontend/), exposes the VocaVoid music-project
 API (/vv/api/v1), proxies synthesis to the VocaForge gateway (/api/v1), and
@@ -9,10 +9,13 @@ English output in logs/errors. No third-party deps.
 """
 from __future__ import annotations
 
+import atexit
 import json
 import mimetypes
 import os
+import subprocess
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -106,6 +109,63 @@ def vf_call(method: str, path: str, body: dict | None = None, raw: bytes | None 
         return exc.code, detail
     except URLError as exc:
         return 502, {"error": f"VocaForge gateway unreachable: {exc.reason}"}
+
+
+# ---- VocaForge gateway self-heal ------------------------------------------
+# If no VF gateway is reachable when VV starts, spawn one so the console never
+# hits a 502. (When run via run.py, VF is usually already up — we only spawn
+# our own if the externally managed one never came online.)
+VF_PROC = None
+
+
+def _vf_reachable(vf_url: str, timeout: float = 1.5) -> bool:
+    try:
+        req = Request(vf_url.rstrip("/") + "/api/v1/health")
+        with urlopen(req, timeout=timeout) as r:
+            return r.status == 200
+    except Exception:
+        return False
+
+
+def ensure_vf(vf_url: str, vocaforge_dir: str | None = None):
+    """Wait for a reachable VF gateway; if none appears, spawn one locally."""
+    global VF_PROC
+    host = urlparse(vf_url).hostname or "127.0.0.1"
+    port = urlparse(vf_url).port or 8080
+    # Give an externally started gateway a short grace window to come online.
+    for _ in range(3):
+        if _vf_reachable(vf_url):
+            return
+        time.sleep(0.5)
+    vf_cli = os.path.join(vocaforge_dir or os.environ.get("VOCAFORGE_DIR", r"E:\PC\VocaForge"), "vf_cli.py")
+    if not os.path.isfile(vf_cli):
+        print(f"[VocaVoid] WARN: VocaForge not found at {vf_cli}; synthesis will be unavailable.")
+        return
+    try:
+        VF_PROC = subprocess.Popen(
+            [sys.executable, vf_cli, "api", "--host", host, "--port", str(port)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+        print(f"[VocaVoid] spawned VocaForge gateway (pid {VF_PROC.pid}) -> {vf_url}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"[VocaVoid] WARN: could not start VocaForge gateway: {exc}")
+        return
+    for _ in range(16):
+        if _vf_reachable(vf_url):
+            print(f"[VocaForge] gateway auto-started and reachable: {vf_url}")
+            return
+        time.sleep(0.5)
+
+
+def _stop_vf():
+    if VF_PROC is not None and VF_PROC.poll() is None:
+        try:
+            VF_PROC.terminate()
+        except Exception:
+            pass
+
+
+atexit.register(_stop_vf)
 
 
 # ---- project helpers -------------------------------------------------------
@@ -300,7 +360,7 @@ class VVHandler(BaseHTTPRequestHandler):
         if sub == "projects":
             return self._send_json(200, {"projects": list_projects()})
         if sub == "voicebanks":
-            return self._send_json(200, {"voicebanks": self._voicebanks()})
+            return self._send_json(200, self._voicebanks())  # dict: {voicebanks, vf_ok, vf_error}
         if sub.startswith("projects/"):
             pid = sub[len("projects/"):]
             fp = os.path.join(PROJECTS, f"{pid}.json")
@@ -335,6 +395,11 @@ class VVHandler(BaseHTTPRequestHandler):
             if not os.path.isfile(path):
                 return self._send_json(400, {"error": "file not found", "path": path})
             st, resp = vf_call("POST", "/api/v1/models", {"path": path})
+            if st == 502:
+                return self._send_json(503, {
+                    "error": "VocaForge 网关无响应，无法注册声库。请确认 VocaForge 已启动（运行 python run.py 或 vf-cli api）。",
+                    "vf_ok": False,
+                })
             return self._send_json(st, resp)
         if sub.startswith("projects/") and sub.endswith("/synth"):
             pid = sub[len("projects/"):-len("/synth")]
@@ -409,6 +474,11 @@ class VVHandler(BaseHTTPRequestHandler):
             "project": synth_project,
             "out": out_path,
         })
+        if st == 502:
+            return self._send_json(503, {
+                "error": "VocaForge 网关无响应，无法合成。请确认 VocaForge 已启动（运行 python run.py 或 vf-cli api），或稍后重试。",
+                "vf_ok": False,
+            })
         if st != 200:
             return self._send_json(st, resp)
         resp["url"] = f"/vv/wav/{fname}"
@@ -416,8 +486,10 @@ class VVHandler(BaseHTTPRequestHandler):
         return self._send_json(200, resp)
 
     # -- voicebanks aggregate --
-    def _voicebanks(self) -> list[dict]:
+    def _voicebanks(self) -> dict:
         vbs = []
+        vf_ok = True
+        vf_error = None
         # 1) VocaForge registered models
         st, resp = vf_call("GET", "/api/v1/models")
         if st == 200 and isinstance(resp, dict):
@@ -430,6 +502,10 @@ class VVHandler(BaseHTTPRequestHandler):
                     "source": "vocaforge",
                     "path": m.get("path", ""),
                 })
+        elif st == 502:
+            # VocaForge gateway is down — degrade gracefully, do not 502.
+            vf_ok = False
+            vf_error = "VocaForge 网关无响应（合成不可用，但编辑器正常工作）。"
         # 2) local .vfvp files (may need py7zr to read meta)
         for fn in sorted(os.listdir(VFVP)):
             if not fn.lower().endswith(".vfvp"):
@@ -444,13 +520,17 @@ class VVHandler(BaseHTTPRequestHandler):
                 "path": full,
                 "registered": any(v.get("path") == full for v in vbs),
             })
-        return vbs
+        return {"voicebanks": vbs, "vf_ok": vf_ok, "vf_error": vf_error}
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8000):
     httpd = HTTPServer((host, port), VVHandler)
     print(f"[VocaVoid] console listening on http://{host}:{port}")
-    print(f"[VocaVoid] VocaForge gateway: {VF_URL}")
+    print(f"[VocaVoid] VocaForge gateway target: {VF_URL}")
+    # Self-heal in the background so the console comes up instantly even if VF
+    # is not running yet.
+    import threading
+    threading.Thread(target=ensure_vf, args=(VF_URL,), daemon=True).start()
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -461,7 +541,7 @@ def run_server(host: str = "127.0.0.1", port: int = 8000):
 
 if __name__ == "__main__":
     import argparse
-    ap = argparse.ArgumentParser(description="VocaVoid1 backend server")
+    ap = argparse.ArgumentParser(description="VocaVoid backend server")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
     ap.add_argument("--vf", default=None, help="VocaForge gateway base URL")

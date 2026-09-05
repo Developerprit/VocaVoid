@@ -1,4 +1,4 @@
-# VocaVoid1 — VF 音乐编辑器 · 技术规划 (Planning)
+# VocaVoid — VF 音乐编辑器 · 技术规划 (Planning)
 
 > Status: Draft v1 · 2026-09-05
 > Owner: 小织 (Weave) for 陌老师
@@ -8,7 +8,7 @@
 
 ## 1. 项目定义 (Definition)
 
-**VocaVoid1** 是一个**带 Web 控制台的 VF 音乐编辑器**（不是声库打包器）。
+**VocaVoid** 是一个**带 Web 控制台的 VF 音乐编辑器**（不是声库打包器）。
 它以 [VocaForge 0.4.2](E:/PC/VocaForge) 为后端合成引擎，用
 [Harvey UI](E:/php/Harvey UI/hui.js) 构建控制台前端，让用户在浏览器里作曲、
 填词、选声库并一键合成歌唱音频。
@@ -157,7 +157,7 @@ frontend/
 - 依赖：仅 Python 标准库（VV）；VocaForge 自带零依赖核心；**真实 `.vfvp` 加载需 `py7zr`**
   （`pip install py7zr`，装到受管 venv），Stub 合成无需。
 - 交付物：`README.md`(+`README-zh.md` 链接)、`README-zh.md`、`LICENSE`、`index.html`(公开落地页)、
-  代码可用性自检、GitHub 上传（先认证 `Developerprit/VocaVoid1` 存在性）。
+  代码可用性自检、GitHub 上传（先认证 `Developerprit/VocaVoid` 存在性）。
 
 ---
 
