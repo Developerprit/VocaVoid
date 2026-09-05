@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VocaVoid1 · VF 音乐编辑器</title>
+  <link rel="icon" href="assets/VV_icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <script>
+    // apply persisted theme before paint to avoid flash
+    document.documentElement.dataset.theme = localStorage.getItem('vv-theme') || 'dark';
+  </script>
+</head>
+<body>
+  <div id="app">
+    <hui src="components/Header.hui"></hui>
+
+    <div class="layout">
+      <hui src="components/Sidebar.hui"></hui>
+
+      <section class="stage">
+        <div class="pianoroll-scroll" id="prScroll">
+          <canvas id="pianoroll"></canvas>
+          <div class="empty-state" id="emptyState">
+            <div>
+              <div style="font-size:40px">🎹</div>
+              <h3>空白音轨</h3>
+              <p>在右侧网格中单击以放置音符，双击音符编辑歌词。<br/>完成后选择声库并点击「合成并保存」生成歌唱音频。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="inspector hidden" id="inspector"></div>
+
+        <hui src="components/Transport.hui"></hui>
+      </section>
+    </div>
+
+    <div id="toast"></div>
+
+    <div class="modal-back" id="modalBack">
+      <div class="modal">
+        <h3>新建歌曲工程</h3>
+        <label style="font-size:11px;color:var(--muted);letter-spacing:.6px;">工程名称</label>
+        <input type="text" id="newNameInput" placeholder="未命名歌曲" style="margin-top:6px;" />
+        <div class="row">
+          <button class="ghost" id="modalCancel">取消</button>
+          <button class="primary" id="modalCreate">创建</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="hui.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/pianoroll.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

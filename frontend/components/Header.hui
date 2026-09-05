@@ -1,0 +1,16 @@
+<is harvey>
+<style>
+  /* header chrome — variables come from theme.css */
+  .vv-header { width: 100%; }
+  .theme-btn { font-family: var(--font-mono); }
+</style>
+<body>
+  <img class="vv-logo" id="logo" src="assets/VV_icon.png" alt="VocaVoid" />
+  <div class="vv-title">VocaVoid<small>VF MUSIC EDITOR</small></div>
+  <div class="vv-spacer"></div>
+  <div class="vv-status">
+    <span class="dot" id="vfDot"></span>
+    <span id="vfText">VF: 检测中…</span>
+  </div>
+  <button class="theme-btn" id="themeToggle" title="切换明暗主题">◐</button>
+</body>

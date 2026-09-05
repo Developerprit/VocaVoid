@@ -1,0 +1,25 @@
+<is harvey>
+<style>
+  .transport { width: 100%; }
+  .transport .field label { margin-bottom: 2px; }
+</style>
+<body>
+  <div class="transport">
+    <div class="field">
+      <label>速度 BPM</label>
+      <input id="tempoInput" type="number" min="20" max="400" value="100" />
+    </div>
+    <div class="field">
+      <label>移调</label>
+      <input id="transposeInput" type="number" min="-24" max="24" value="0" />
+    </div>
+    <div class="field grow">
+      <label>声库 Voicebank</label>
+      <select id="voicebankSelect"></select>
+    </div>
+    <button class="primary" id="synthBtn">▶ 合成并保存</button>
+    <button id="clearBtn">清空</button>
+    <button class="ghost" id="exportBtn">导出</button>
+    <span class="play-url" id="lastResult"></span>
+  </div>
+</body>

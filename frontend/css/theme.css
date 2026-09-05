@@ -1,0 +1,294 @@
+/* =========================================================================
+   VocaVoid1 — Dark Synth Studio design system
+   Single source of truth for the console. Harvey UI component <style> blocks
+   reference these CSS variables, so both the HUI chrome and the canvas UI
+   share one coherent theme (dark + light).
+   ========================================================================= */
+
+:root {
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+
+  /* Dark (default) — warm near-black, studio amber accent */
+  --bg: #0c0d10;
+  --bg-grad: radial-gradient(1200px 600px at 78% -8%, #1a1410 0%, transparent 60%),
+             radial-gradient(900px 500px at 0% 110%, #0e1620 0%, transparent 55%),
+             #0c0d10;
+  --panel: #14171c;
+  --panel-2: #1a1e25;
+  --raised: #20252e;
+  --line: #262b33;
+  --line-soft: #1d2128;
+  --text: #e9e4da;
+  --muted: #8b929c;
+  --faint: #5b616b;
+  --accent: #ff7a45;      /* studio amber */
+  --accent-ink: #1a0e06;
+  --accent-2: #38d6c0;    /* signal teal */
+  --danger: #ff4d5e;
+  --good: #5fd17a;
+  --grid: rgba(255, 255, 255, 0.045);
+  --grid-strong: rgba(255, 255, 255, 0.10);
+  --note-a: #ff9a5e;
+  --note-b: #ff6a30;
+  --note-sel: #ffd79a;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --r: 12px;
+  --r-sm: 8px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --bg: #f2efe7;
+  --bg-grad: radial-gradient(1100px 560px at 80% -10%, #fbe9dd 0%, transparent 60%),
+             radial-gradient(820px 480px at 0% 110%, #e4eef0 0%, transparent 55%),
+             #f2efe7;
+  --panel: #ffffff;
+  --panel-2: #fbf9f4;
+  --raised: #ffffff;
+  --line: #e4ddcf;
+  --line-soft: #efe9dd;
+  --text: #1b1d22;
+  --muted: #6b7079;
+  --faint: #9aa0a8;
+  --accent: #e8632e;
+  --accent-ink: #fff4ec;
+  --accent-2: #149e8c;
+  --danger: #d83a48;
+  --good: #2fa75a;
+  --grid: rgba(0, 0, 0, 0.05);
+  --grid-strong: rgba(0, 0, 0, 0.12);
+  --note-a: #ff8a4d;
+  --note-b: #f06a2e;
+  --note-sel: #c9531c;
+  --shadow: 0 10px 26px rgba(60, 40, 20, 0.12);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+body { background: var(--bg-grad); background-attachment: fixed; }
+
+#app {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---------- buttons & inputs ---------- */
+button, input, select {
+  font-family: var(--font-display);
+  color: var(--text);
+}
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform 0.18s var(--ease), border-color 0.18s var(--ease),
+              background 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+button:hover { border-color: var(--accent); transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+button.primary {
+  background: linear-gradient(135deg, var(--note-a), var(--note-b));
+  border-color: transparent;
+  color: var(--accent-ink);
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(255, 106, 48, 0.28);
+}
+button.primary:hover { box-shadow: 0 10px 26px rgba(255, 106, 48, 0.4); }
+button.ghost { background: transparent; }
+button.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+input[type="number"], input[type="text"], select {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  width: 100%;
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+label { font-size: 11px; letter-spacing: 0.6px; color: var(--muted); text-transform: uppercase; }
+
+/* ---------- header (HUI) ---------- */
+.vv-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 11px 22px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel) 82%, transparent);
+  backdrop-filter: blur(8px);
+}
+.vv-logo { width: 34px; height: 34px; border-radius: 9px; box-shadow: var(--shadow); }
+.vv-title { font-weight: 700; font-size: 18px; letter-spacing: 0.4px; line-height: 1; }
+.vv-title small {
+  display: block; font-family: var(--font-mono); font-size: 9.5px;
+  color: var(--accent); letter-spacing: 3px; font-weight: 500; margin-top: 3px;
+}
+.vv-spacer { flex: 1; }
+.vv-status {
+  font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--faint); transition: all 0.3s var(--ease); }
+.dot.ok { background: var(--good); box-shadow: 0 0 10px var(--good); }
+.dot.bad { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+.theme-btn {
+  width: 38px; height: 38px; padding: 0; font-size: 17px; border-radius: 10px;
+  display: grid; place-items: center;
+}
+
+/* ---------- layout ---------- */
+.layout { display: flex; min-height: 0; }
+.sidebar {
+  width: 286px; flex: none; border-right: 1px solid var(--line);
+  background: var(--panel); display: flex; flex-direction: column; min-height: 0;
+}
+.stage { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+/* ---------- sidebar (HUI) ---------- */
+.side-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+}
+.side-title {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px;
+  color: var(--muted); text-transform: uppercase;
+}
+.new-btn {
+  padding: 6px 12px; font-size: 12px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--note-a), var(--note-b));
+  color: var(--accent-ink); border: none; font-weight: 700;
+}
+.project-list, .voicebank-list { overflow-y: auto; padding: 4px 10px; flex: 1; min-height: 0; }
+.vb-section-title {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+  color: var(--faint); text-transform: uppercase; padding: 12px 6px 6px;
+}
+.side-foot { padding: 10px 14px; border-top: 1px solid var(--line-soft); }
+
+/* project item (vanilla) */
+.proj {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; margin: 4px 0; border-radius: var(--r-sm);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background 0.16s var(--ease), border-color 0.16s var(--ease);
+}
+.proj:hover { background: var(--panel-2); }
+.proj.active { background: var(--panel-2); border-color: var(--accent); }
+.proj .pdot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); flex: none; }
+.proj .pmeta { min-width: 0; flex: 1; }
+.proj .pname { font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proj .psub { font-family: var(--font-mono); font-size: 10.5px; color: var(--faint); }
+.proj .pdel { opacity: 0; color: var(--faint); font-size: 14px; padding: 2px 6px; border-radius: 6px; }
+.proj:hover .pdel { opacity: 1; }
+.proj .pdel:hover { color: var(--danger); background: color-mix(in srgb, var(--danger) 14%, transparent); }
+
+/* voicebank item (vanilla) */
+.vb {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px; margin: 4px 0;
+  border-radius: var(--r-sm); border: 1px solid var(--line-soft); background: var(--panel-2);
+}
+.vb .vicon { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, var(--note-a), var(--note-b)); display: grid; place-items: center; color: var(--accent-ink); font-weight: 700; font-size: 11px; flex: none; }
+.vb .vmeta { min-width: 0; flex: 1; }
+.vb .vname { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vb .vsub { font-family: var(--font-mono); font-size: 10px; color: var(--faint); }
+.vb .vtag { font-family: var(--font-mono); font-size: 9px; padding: 2px 6px; border-radius: 999px; background: color-mix(in srgb, var(--accent-2) 16%, transparent); color: var(--accent-2); }
+
+/* ---------- stage ---------- */
+.pianoroll-scroll {
+  flex: 1; min-height: 0; overflow: auto; position: relative;
+  background:
+    linear-gradient(var(--panel), var(--panel)) padding-box;
+}
+#pianoroll { display: block; }
+
+.empty-state {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  color: var(--muted); pointer-events: none; padding: 24px;
+}
+.empty-state h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 10px 0 6px; color: var(--text); }
+.empty-state p { font-size: 13px; max-width: 360px; line-height: 1.6; }
+
+/* transport (HUI) */
+.transport {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 18px; border-top: 1px solid var(--line); background: var(--panel);
+}
+.transport .field { display: flex; flex-direction: column; gap: 5px; min-width: 92px; }
+.transport .field.grow { flex: 1; min-width: 150px; }
+.transport .play-url { font-family: var(--font-mono); font-size: 11px; color: var(--accent-2); margin-left: auto; }
+.transport .play-url a { color: var(--accent-2); }
+
+/* inspector */
+.inspector {
+  border-top: 1px solid var(--line-soft); background: var(--panel-2);
+  padding: 12px 18px; display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap;
+  font-size: 12px;
+}
+.inspector.hidden { display: none; }
+.inspector .ifield { display: flex; flex-direction: column; gap: 5px; }
+.inspector .ik { color: var(--muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; }
+.inspector input { width: 120px; }
+.inspector .lyric-input { width: 160px; }
+
+/* toast */
+#toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--raised); border: 1px solid var(--line); color: var(--text);
+  padding: 10px 18px; border-radius: 999px; font-size: 13px; box-shadow: var(--shadow);
+  opacity: 0; pointer-events: none; transition: all 0.3s var(--ease); z-index: 50;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.err { border-color: var(--danger); color: var(--danger); }
+#toast.ok { border-color: var(--good); color: var(--good); }
+
+/* modal */
+.modal-back {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none;
+  place-items: center; z-index: 100; backdrop-filter: blur(3px);
+}
+.modal-back.show { display: grid; }
+.modal {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
+  padding: 22px; width: 340px; box-shadow: var(--shadow);
+}
+.modal h3 { margin: 0 0 14px; font-size: 16px; }
+.modal .row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--faint); }
+::-webkit-scrollbar-track { background: transparent; }
+
+.hui-error { padding: 16px; color: var(--danger); font-family: var(--font-mono); }
+
+/* The Harvey UI engine wraps each <hui> in a <div class="hui-rendered">.
+   Layout must target those wrappers (original <hui> classes are dropped). */
+#app > .hui-rendered { width: 100%; }
+.layout > .hui-rendered { width: 286px; flex: none; min-height: 0; display: flex; }
+.stage > .hui-rendered { width: 100%; }
+.hui-rendered > .sidebar,
+.hui-rendered > .vv-header,
+.hui-rendered > .transport { width: 100%; }
