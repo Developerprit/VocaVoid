@@ -1,5 +1,5 @@
 /* =========================================================================
-   VocaVoid — console controller. Wires Harvey UI chrome + PianoRoll + VV API.
+   VocaVoid — console controller. Wires the native chrome + PianoRoll + VV API.
    ========================================================================= */
 (function () {
   "use strict";
@@ -17,23 +17,12 @@
 
   /* ---------------- boot ---------------- */
   function boot() {
-    waitForRender().then(init).catch((e) => {
+    try {
+      init();
+    } catch (e) {
       console.error(e);
-      toast("界面渲染失败: " + e.message, "err");
-    });
-  }
-
-  function waitForRender(timeout = 5000) {
-    return new Promise((resolve, reject) => {
-      const t0 = Date.now();
-      (function poll() {
-        if ($("newSongBtn") && $("synthBtn") && $("vfDot") && $("voicebankSelect") && $("tempoInput")) {
-          return resolve();
-        }
-        if (Date.now() - t0 > timeout) return reject(new Error("Harvey UI render timeout"));
-        setTimeout(poll, 30);
-      })();
-    });
+      toast("界面初始化失败: " + e.message, "err");
+    }
   }
 
   function init() {

@@ -1,6 +1,6 @@
 # VocaVoid
 
-> A **VF music editor** with a web console, built on **VocaForge 0.4.2** (backend synthesis) and **Harvey UI** (frontend).
+> A **VF music editor** with a web console, built on **VocaForge 0.4.2** (backend synthesis) and a **native frontend**.
 > [中文文档 / Chinese](./README-zh.md)
 
 Compose melodies on a piano-roll, attach lyrics to each note, pick a voicebank
@@ -16,7 +16,7 @@ Compose melodies on a piano-roll, attach lyrics to each note, pick a voicebank
 - **Voicebank picker** — choose from registered `.vfvp` libraries or the built-in `stub-zh` test voice.
 - **One-click synthesis** — sends the song to VocaForge and writes a WAV into `wav/`.
 - **Project persistence** — songs are saved as JSON in `projects/`.
-- **Dark Synth Studio UI** with a light theme, built with Harvey UI components.
+- **Dark Synth Studio UI** with a light theme, built as a native frontend.
 - **No heavy deps** — the VV backend is pure Python stdlib; VocaForge runs the stub backend without models.
 
 ## Tech stack
@@ -25,7 +25,7 @@ Compose melodies on a piano-roll, attach lyrics to each note, pick a voicebank
 |-------|------------|
 | Backend engine | [VocaForge 0.4.2](https://github.com/Developerprit/VocaForge) (`/api/v1` REST gateway) |
 | Console backend | `vv_server.py` — stdlib `http.server` (static + `/vv/api/v1` + synth proxy) |
-| Frontend | [Harvey UI](https://harveyui.rth1.xyz) (`<hui>` components) + Canvas piano-roll |
+| Frontend | Native HTML/CSS/JS + Canvas piano-roll |
 | Launcher | `run.py` — starts VV + VF together |
 | Icon | `VV_icon.png` |
 
@@ -47,7 +47,7 @@ Requirements: Python 3.9+. No `pip install` needed for the core flow
 ## How it works
 
 ```
-Browser (Harvey UI console + Canvas piano-roll)
+Browser (native console + Canvas piano-roll)
         │  /vv/*
         ▼
 VocaVoid backend :8000  ── synth proxy ──▶  VocaForge gateway :8080  (/api/v1)
@@ -86,10 +86,8 @@ VocaVoid/
 ├── run.py              # launcher (VV + VF)
 ├── vv_server.py        # VocaVoid backend
 ├── frontend/
-│   ├── index.html      # Harvey UI console
-│   ├── hui.js          # Harvey UI engine (local copy)
+│   ├── index.html      # native console
 │   ├── css/theme.css   # Dark Synth Studio design system
-│   ├── components/     # .hui chrome (Header / Sidebar / Transport)
 │   ├── js/api.js       # VV API client
 │   ├── js/pianoroll.js # Canvas piano-roll engine
 │   └── js/app.js       # console controller

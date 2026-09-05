@@ -1,6 +1,6 @@
 # VocaVoid（中文文档）
 
-> 一个**带 Web 控制台的 VF 音乐编辑器**，基于 **VocaForge 0.4.2**（后端合成引擎）与 **Harvey UI**（前端框架）构建。
+> 一个**带 Web 控制台的 VF 音乐编辑器**，基于 **VocaForge 0.4.2**（后端合成引擎）与**原生前端**构建。
 > [English](./README.md)
 
 在钢琴卷帘上作曲、为每个音符填词、选择声库（`.vfvp`），即可在浏览器里一键合成歌唱音频。
@@ -15,7 +15,7 @@ VocaVoid 以**VV + VF 同时运行**的方式作为一个整体启动。
 - **声库选择** — 从已注册的 `.vfvp` 声库或内置 `stub-zh` 测试声库中选择。
 - **一键合成** — 将歌曲发送给 VocaForge，并把 WAV 写入 `wav/`。
 - **工程持久化** — 歌曲以 JSON 形式保存在 `projects/`。
-- **暗色合成器工作室 UI**，附带浅色主题，由 Harvey UI 组件构建。
+- **暗色合成器工作室 UI**，附带浅色主题，由原生前端构建。
 - **零重依赖** — VV 后端为纯 Python 标准库；VocaForge 的 stub 后端无需任何模型即可合成。
 
 ## 技术栈
@@ -24,7 +24,7 @@ VocaVoid 以**VV + VF 同时运行**的方式作为一个整体启动。
 |----|------|
 | 后端合成引擎 | [VocaForge 0.4.2](https://github.com/Developerprit/VocaForge)（`/api/v1` REST 网关） |
 | 控制台后端 | `vv_server.py` — 标准库 `http.server`（静态资源 + `/vv/api/v1` + 合成代理） |
-| 前端 | [Harvey UI](https://harveyui.rth1.xyz)（`<hui>` 组件）+ Canvas 钢琴卷帘 |
+| 前端 | 原生 HTML/CSS/JS + Canvas 钢琴卷帘 |
 | 启动器 | `run.py` — 同时启动 VV 与 VF |
 | 图标 | `VV_icon.png` |
 
@@ -45,7 +45,7 @@ python run.py
 ## 工作原理
 
 ```
-浏览器（Harvey UI 控制台 + Canvas 钢琴卷帘）
+浏览器（原生控制台 + Canvas 钢琴卷帘）
         │  /vv/*
         ▼
 VocaVoid 后端 :8000  ── 合成代理 ──▶  VocaForge 网关 :8080  (/api/v1)
@@ -84,10 +84,8 @@ VocaVoid/
 ├── run.py              # 启动器（VV + VF）
 ├── vv_server.py        # VocaVoid 后端
 ├── frontend/
-│   ├── index.html      # Harvey UI 控制台
-│   ├── hui.js          # Harvey UI 引擎（本地副本）
+│   ├── index.html      # 原生控制台
 │   ├── css/theme.css   # 暗色合成器工作室设计系统
-│   ├── components/     # .hui 外壳（Header / Sidebar / Transport）
 │   ├── js/api.js       # VV API 客户端
 │   ├── js/pianoroll.js # Canvas 钢琴卷帘引擎
 │   └── js/app.js       # 控制台控制器

@@ -10,14 +10,14 @@
 
 **VocaVoid** 是一个**带 Web 控制台的 VF 音乐编辑器**（不是声库打包器）。
 它以 [VocaForge 0.4.2](E:/PC/VocaForge) 为后端合成引擎，用
-[Harvey UI](E:/php/Harvey UI/hui.js) 构建控制台前端，让用户在浏览器里作曲、
+原生前端构建控制台，让用户在浏览器里作曲、
 填词、选声库并一键合成歌唱音频。
 
 | 项 | 值 |
 |----|----|
 | 类型 | Web 音乐编辑器 + 控制台前端 |
 | 后端框架 | VocaForge 0.4.2 (pure Python, `/api/v1` REST 网关) |
-| 前端框架 | Harvey UI (`<hui src>` 组件引擎) |
+| 前端框架 | 原生前端 (Native HTML/CSS/JS + Canvas) |
 | 图标 | `VV_icon.png` |
 | 运行方式 | **VV + VF 同时运行**（一个启动器拉起两个进程） |
 | 声库存放 | `VocaVoid/vfvp/*.vfvp` |
@@ -31,7 +31,7 @@
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Browser  (Harvey UI 控制台 + Canvas 钢琴卷帘) │
+│  Browser  (原生控制台 + Canvas 钢琴卷帘)        │
 └───────────────┬───────────────┬─────────────┘
                 │  /vv/*         │  (可选直连, 已禁用)
                 ▼                ▼
@@ -115,14 +115,8 @@
 
 ```
 frontend/
-├── index.html              # Harvey UI 页面：外壳 <hui> + #pianoroll 容器 + 应用挂载
+├── index.html              # 原生前端页面：外壳 + #pianoroll 容器 + 应用挂载
 ├── css/theme.css          # 设计系统（暗色合成器工作室 / 浅色），CSS 变量，动效
-├── components/             # .hui 组件（均以 <is harvey> 开头，禁止嵌套 <hui>）
-│   ├── Header.hui         # 图标 + 标题 + 主题切换 + VF 状态灯
-│   ├── Sidebar.hui        # 工程列表 + 新建按钮
-│   ├── Transport.hui      # 速度/移调/声库选择/合成保存/清空
-│   ├── VoicebankCard.hui  # 声库卡片
-│   └── ProjectItem.hui    # 侧栏工程项
 ├── js/
 │   ├── api.js             # VV/FV fetch 封装
 │   ├── pianoroll.js       # Canvas 钢琴卷帘编辑器
@@ -130,10 +124,9 @@ frontend/
 └── assets/VV_icon.png     # 项目图标（复制自根目录）
 ```
 
-**关键决策**：Harvey UI 用于**静态外壳组件**（Header/Sidebar/Transport/卡片），
-动态列表（工程项、音符属性、钢琴卷帘）用原生 JS DOM + Canvas 渲染——
-因为 Harvey UI 的占位符模型要求全局唯一 id，不适合海量动态实例。
-`.hui` 样式统一引用 `theme.css` 的全局 CSS 变量，保证双主题一致。
+**关键决策**：控制台外壳（Header/Sidebar/Transport）与动态列表（工程项、音符属性、钢琴卷帘）
+一律用原生 HTML/CSS/JS + Canvas 渲染——无框架依赖、无构建步骤，浏览器直接加载。
+`.html` / `.css` 统一引用 `theme.css` 的全局 CSS 变量，保证双主题一致。
 
 ### 钢琴卷帘 (核心体验)
 - 纵向 = 音高轨（约 C3–C6，带八度分隔线）；横向 = 时间轴（拍线 + 细分线）。
@@ -167,5 +160,5 @@ frontend/
 | VocaForge 无"工程存储"，仅合成/注册 | VocaVoid 自管 `projects/*.json` |
 | VocaForge `Note` 无 start、单声部 | 编辑器转顺序序列 + 休止填充，重叠忽略 |
 | `.vfvp` 需 py7zr | 预装到受管 venv；Stub 兜底试听 |
-| Harvey UI 全局 id 冲突 | 静态外壳用 HUI，动态/列表用原生 JS |
+| 双主题一致性 | 外壳与列表统一用原生 + CSS 变量，theme.css 单一来源 |
 | 双进程生命周期 | run.py 统一拉起/关闭，SIGINT 级联终止 |

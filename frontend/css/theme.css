@@ -1,8 +1,8 @@
 /* =========================================================================
    VocaVoid — Dark Synth Studio design system
-   Single source of truth for the console. Harvey UI component <style> blocks
-   reference these CSS variables, so both the HUI chrome and the canvas UI
-   share one coherent theme (dark + light).
+   Single source of truth for the console. All chrome is native HTML/CSS that
+   consumes these CSS variables, so the whole console (header, sidebar,
+   transport, canvas UI) shares one coherent theme (dark + light).
    ========================================================================= */
 
 :root {
@@ -131,7 +131,7 @@ input:focus, select:focus {
 }
 label { font-size: 11px; letter-spacing: 0.6px; color: var(--muted); text-transform: uppercase; }
 
-/* ---------- header (HUI) ---------- */
+/* ---------- header ---------- */
 .vv-header {
   display: flex; align-items: center; gap: 14px;
   padding: 11px 22px;
@@ -166,7 +166,7 @@ label { font-size: 11px; letter-spacing: 0.6px; color: var(--muted); text-transf
 }
 .stage { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 
-/* ---------- sidebar (HUI) ---------- */
+/* ---------- sidebar ---------- */
 .side-head {
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 16px 10px;
@@ -230,7 +230,7 @@ label { font-size: 11px; letter-spacing: 0.6px; color: var(--muted); text-transf
 .empty-state h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 10px 0 6px; color: var(--text); }
 .empty-state p { font-size: 13px; max-width: 360px; line-height: 1.6; }
 
-/* transport (HUI) */
+/* transport */
 .transport {
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   padding: 12px 18px; border-top: 1px solid var(--line); background: var(--panel);
@@ -281,14 +281,3 @@ label { font-size: 11px; letter-spacing: 0.6px; color: var(--muted); text-transf
 ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 8px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 ::-webkit-scrollbar-track { background: transparent; }
-
-.hui-error { padding: 16px; color: var(--danger); font-family: var(--font-mono); }
-
-/* The Harvey UI engine wraps each <hui> in a <div class="hui-rendered">.
-   Layout must target those wrappers (original <hui> classes are dropped). */
-#app > .hui-rendered { width: 100%; }
-.layout > .hui-rendered { width: 286px; flex: none; min-height: 0; display: flex; }
-.stage > .hui-rendered { width: 100%; }
-.hui-rendered > .sidebar,
-.hui-rendered > .vv-header,
-.hui-rendered > .transport { width: 100%; }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """VocaVoid backend — pure stdlib HTTP server.
 
-Serves the Harvey UI console (frontend/), exposes the VocaVoid music-project
+Serves the native web console (frontend/), exposes the VocaVoid music-project
 API (/vv/api/v1), proxies synthesis to the VocaForge gateway (/api/v1), and
 serves generated WAVs (wav/).
 
@@ -40,7 +40,6 @@ DEFAULT_GRID = 0.25
 
 MIME = {
     ".html": "text/html; charset=utf-8",
-    ".hui": "text/plain; charset=utf-8",
     ".js": "text/javascript; charset=utf-8",
     ".css": "text/css; charset=utf-8",
     ".png": "image/png",
