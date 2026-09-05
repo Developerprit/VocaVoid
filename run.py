@@ -41,6 +41,7 @@ def start_vf(vf_host: str, vf_port: int) -> subprocess.Popen | None:
 
 
 def start_vv(vv_host: str, vv_port: int, vf_url: str) -> subprocess.Popen:
+    os.environ["VV_NO_ENSURE_VF"] = "1"  # run.py already manages VF; don't double-spawn
     cmd = [PY, VV_SERVER, "--host", vv_host, "--port", str(vv_port), "--vf", vf_url]
     print(f"[run] starting VocaVoid console:   {' '.join(cmd)}")
     p = subprocess.Popen(cmd)

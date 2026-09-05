@@ -18,7 +18,7 @@ import sys
 import time
 import uuid
 from datetime import datetime, timezone
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.error import URLError, HTTPError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
@@ -106,8 +106,11 @@ def vf_call(method: str, path: str, body: dict | None = None, raw: bytes | None 
         except Exception:
             detail = {"error": exc.reason}
         return exc.code, detail
-    except URLError as exc:
-        return 502, {"error": f"VocaForge gateway unreachable: {exc.reason}"}
+    except (URLError, OSError) as exc:
+        # OSError covers ConnectionAbortedError / ConnectionResetError /
+        # BrokenPipeError / socket.timeout raised when the VF gateway drops the
+        # connection mid-request (WinError 10053 / 10054). Never let it crash.
+        return 502, {"error": f"VocaForge gateway unreachable: {exc}"}
 
 
 # ---- VocaForge gateway self-heal ------------------------------------------
@@ -219,6 +222,27 @@ class VVHandler(BaseHTTPRequestHandler):
     def log_message(self, *args):  # silence default logging
         return
 
+    def handle_error(self, request, client_address):
+        """Swallow benign client-disconnect errors (Windows WinError 10053/10054).
+
+        When a browser navigates away or aborts a fetch, the socket closes
+        mid-request and Windows raises ConnectionAbortedError / ConnectionResetError
+        / BrokenPipeError. These are not server bugs and must not crash or spam.
+        """
+        exc = sys.exc_info()[1]
+        if isinstance(exc, (ConnectionAbortedError, ConnectionResetError,
+                            BrokenPipeError, OSError)):
+            return
+        super().handle_error(request, client_address)
+
+    def _write(self, data: bytes) -> None:
+        try:
+            self.wfile.write(data)
+        except (ConnectionAbortedError, ConnectionResetError,
+                BrokenPipeError, OSError):
+            # client already gone; nothing to do
+            self.close_connection = True
+
     def _send_json(self, code: int, body: dict):
         payload = json.dumps(body, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
@@ -227,13 +251,17 @@ class VVHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
-        self.wfile.write(payload)
+        self._write(payload)
 
     def _read_body(self) -> dict:
         length = int(self.headers.get("Content-Length", "0") or "0")
         if not length:
             return {}
-        raw = self.rfile.read(length)
+        try:
+            raw = self.rfile.read(length)
+        except (ConnectionAbortedError, ConnectionResetError,
+                BrokenPipeError, OSError):
+            return {}
         try:
             return json.loads(raw.decode("utf-8") or "{}")
         except (ValueError, UnicodeDecodeError):
@@ -252,7 +280,7 @@ class VVHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header("Content-Type", "text/plain; charset=utf-8")
             self.end_headers()
-            self.wfile.write(b"404 Not Found")
+            self._write(b"404 Not Found")
             return
         ext = os.path.splitext(full)[1].lower()
         ctype = MIME.get(ext, mimetypes.guess_type(full)[0] or "application/octet-stream")
@@ -262,7 +290,7 @@ class VVHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         with open(full, "rb") as fh:
-            self.wfile.write(fh.read())
+            self._write(fh.read())
 
     def _serve_wav(self, filename: str):
         full = os.path.join(WAV, os.path.basename(filename))
@@ -270,7 +298,7 @@ class VVHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header("Content-Type", "text/plain; charset=utf-8")
             self.end_headers()
-            self.wfile.write(b"404 wav not found")
+            self._write(b"404 wav not found")
             return
         size = os.path.getsize(full)
         rng = self.headers.get("Range")
@@ -289,7 +317,7 @@ class VVHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 with open(full, "rb") as fh:
                     fh.seek(start)
-                    self.wfile.write(fh.read(length))
+                    self._write(fh.read(length))
                 return
             except Exception:
                 pass
@@ -300,7 +328,7 @@ class VVHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         with open(full, "rb") as fh:
-            self.wfile.write(fh.read())
+            self._write(fh.read())
 
     # -- routing --
     def do_OPTIONS(self):
@@ -523,13 +551,17 @@ class VVHandler(BaseHTTPRequestHandler):
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8000):
-    httpd = HTTPServer((host, port), VVHandler)
+    httpd = ThreadingHTTPServer((host, port), VVHandler)
+    httpd.daemon_threads = True
     print(f"[VocaVoid] console listening on http://{host}:{port}")
     print(f"[VocaVoid] VocaForge gateway target: {VF_URL}")
     # Self-heal in the background so the console comes up instantly even if VF
-    # is not running yet.
-    import threading
-    threading.Thread(target=ensure_vf, args=(VF_URL,), daemon=True).start()
+    # is not running yet. Skipped when an external launcher (run.py) manages VF.
+    if os.environ.get("VV_NO_ENSURE_VF") != "1":
+        import threading
+        threading.Thread(target=ensure_vf, args=(VF_URL,), daemon=True).start()
+    else:
+        print("[VocaVoid] external VF management (self-heal spawn disabled).")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
